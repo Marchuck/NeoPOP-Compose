@@ -5,6 +5,7 @@ package pl.lukaszmarczak.neopop.compose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,12 +46,30 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Greeting("NEOPOP")
                         Spacer(Modifier.size(100.dp))
+
+                        val buttonText = remember { mutableStateOf("Accept") }
+                        val buttonColor = animateColorAsState(
+                            targetValue = if (buttonText.value == "Accept") {
+                                Color.Yellow
+                            } else {
+                                Color.Green
+                            }
+                        )
+
                         NeoPopButton(
-                            buttonColor = Color.Yellow,
+                            buttonColor = buttonColor.value,
                             edgesColors = Color.Gray to Color.LightGray,
                             modifier = Modifier.size(150.dp, 50.dp),
+                            onReachedGround = {
+                                val oldValue = buttonText.value
+                                buttonText.value = if (oldValue == "OK") {
+                                    "Accept"
+                                } else {
+                                    "OK"
+                                }
+                            },
                             buttonContent = {
-                                Text(text = "Accept", textAlign = TextAlign.Center)
+                                Text(text = buttonText.value, textAlign = TextAlign.Center)
                             }
                         )
                         NeoPopButton(
@@ -71,7 +92,6 @@ class MainActivity : ComponentActivity() {
                                 Text(text = "Cancel", textAlign = TextAlign.Center)
                             }
                         )
-
                     }
                 }
             }

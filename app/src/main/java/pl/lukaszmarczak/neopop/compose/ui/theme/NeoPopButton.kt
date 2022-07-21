@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
@@ -22,21 +23,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun NeoPopButton(
     buttonColor: Color,
     edgesColors: Pair<Color, Color>,
     modifier: Modifier = Modifier,
+    onReachedGround: () -> Unit = {},
     buttonContent: @Composable BoxScope.() -> Unit
 ) {
-    val depthSize = Size(35f, 30f)
+    val scope = rememberCoroutineScope()
+    val interactionSource = remember { MutableInteractionSource() }
     val state = remember { mutableStateOf(false) }
+
+    val clickAnimationDuration = 600
     val pressingProgress: Float by animateFloatAsState(
         targetValue = if (state.value) 1f else 0f,
-        animationSpec = tween()
+        animationSpec = tween(durationMillis = clickAnimationDuration / 2)
     )
-    val interactionSource = remember { MutableInteractionSource() }
+
+    val depthSize = Size(35f, 30f)
     Box(
         modifier = modifier
             .background(Color.Transparent)
@@ -46,7 +54,13 @@ fun NeoPopButton(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = {
-                    state.value = state.value.not()
+                    scope.launch {
+                        val oldValue = state.value
+                        state.value = oldValue.not()
+                        delay(clickAnimationDuration / 2L)
+                        onReachedGround.invoke()
+                        state.value = oldValue
+                    }
                 }
             ),
         contentAlignment = Alignment.Center
