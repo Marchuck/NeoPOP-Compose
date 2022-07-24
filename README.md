@@ -1,6 +1,6 @@
 # NeoPOP Compose
 
-sample app demonstrating Jetpack Compose implementation of [CRED's NeoPOP]([NeoPOP](https://cred.club/neopop)) design
+sample app demonstrating Jetpack Compose implementation of [CRED's NeoPOP](https://cred.club/neopop) design
 
 ![Preview](https://github.com/Marchuck/NeoPOP-Compose/blob/master/screenshots/preview.png "Preview")
 
